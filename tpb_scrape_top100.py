@@ -25,7 +25,8 @@ def get_movie_info_from_element(html_element):
     logging.info(f'Extracting info from html element {tpb_title}')
 
     tpb_movie_url = html_element.get('href')
-    tpb_clean_title = re.search('(.*?)\d.*', tpb_title).group(1).replace('.', ' ').strip('(').strip().strip('-')
+    tpb_clean_title = re.search(r'(.*?)\d.*', tpb_title).group(1) \
+        .replace('.', ' ').strip('(').strip().strip('-')
 
     tpb_movie_info = {
         'tpb_title': tpb_title,
@@ -43,7 +44,8 @@ def get_movie_info_from_omdb(title, apikey=OMDB_APIKEY):
     OMDB api returns a json from which I take the necessary movie info fields.
     If movie not found, this function returns an empty dictionary."""
     title_for_omdb_query = title.replace(' ', '+')
-    omdb_url_query = f'http://www.omdbapi.com/?t={title_for_omdb_query}&type=movie&apikey={apikey}'
+    omdb_url_query = (f'http://www.omdbapi.com/'
+                      f'?t={title_for_omdb_query}&type=movie&apikey={apikey}')
     omdb_search = requests.get(omdb_url_query).json()
 
     if omdb_search['Response'] == 'True':
@@ -75,9 +77,11 @@ def get_data_from_elements(elements):
         logging.info(f'Getting data from element {nr}')
 
         tpb_movie_info = get_movie_info_from_element(movie_html_element)
-        omdb_movie_info = get_movie_info_from_omdb(tpb_movie_info['tpb_clean_title'])
+        omdb_movie_info = get_movie_info_from_omdb(
+            tpb_movie_info['tpb_clean_title'])
 
-        movie_data = {**tpb_movie_info, **omdb_movie_info}  # python>=3.5 solution
+        movie_data = {**tpb_movie_info,
+                      **omdb_movie_info}  # python>=3.5 solution
 
         top_movies[nr] = movie_data
 
@@ -86,8 +90,8 @@ def get_data_from_elements(elements):
 
 @log
 def get_top100_movies():
-    """Scrape tpb top 100 movie page and get relevant info about all those movies.
-    Returns the top 100 movies + relevant info."""
+    """Scrape tpb top 100 movie page and get relevant info about all those
+    movies. Returns the top 100 movies + relevant info."""
     top100_soup = get_soup_of_html_page('https://thepiratebay.org/top/201')
     top100_elements = top100_soup.find_all('a', class_='detLink')
     top100_movies = get_data_from_elements(top100_elements)
@@ -102,4 +106,3 @@ def get_top100_movies():
 if __name__ == '__main__':
     logging.info('Starting main app')
     get_top100_movies()
-
