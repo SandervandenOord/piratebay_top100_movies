@@ -1,8 +1,9 @@
 import logging
-import requests
-from bs4 import BeautifulSoup
 import re
+
+from bs4 import BeautifulSoup
 import pandas as pd
+import requests
 
 from local_settings import OMDB_APIKEY
 from utils import log
